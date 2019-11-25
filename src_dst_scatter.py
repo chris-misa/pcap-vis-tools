@@ -18,6 +18,8 @@ times = []
 src_ips = []
 dst_ips = []
 lens = []
+protos = []
+labels = []
 
 USAGE="<source pcap file> <output html graph file> <count or 0 for all>"
 
@@ -48,6 +50,8 @@ for pkt, meta in reader:
         src_ips.append(unpack("I", inet_aton(p[IP].src))[0])
         dst_ips.append(unpack("I", inet_aton(p[IP].dst))[0])
         lens.append(int(p[IP].len))
+        protos.append(int(p[IP].proto))
+        labels.append("src: %s dst: %s proto: %d len: %d" % (p[IP].src, p[IP].dst, p[IP].proto, p[IP].len))
 
     i += 1
     if total != 0 and i == total:
@@ -71,10 +75,14 @@ print("\n")
 scaleLens = [int(l / 250) for l in lens]
 
 fig = go.Figure([go.Scatter3d(x = times, y = dst_ips, z = src_ips, \
+       text=labels, \
        mode="markers", marker = dict( \
-            color = src_ips, size = scaleLens, opacity=0.5, line=dict(width=0)))])
+            color = protos, size = scaleLens, opacity=0.5, \
+            line=dict(width=0), \
+            colorscale="Cividis", \
+            colorbar=dict(tick0=0, dtick=1)))])
 
-fig.update_layout(height=900)
+fig.update_layout(height=1000)
 
 plotly.offline.plot(fig, filename=sys.argv[2])
 

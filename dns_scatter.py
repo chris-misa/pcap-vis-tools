@@ -33,8 +33,6 @@ LLcls = conf.l2types.get(reader.linktype)
 if LLcls is None:
     print("Unknown link type %d" % reader.linktype)
 
-#print("Start reading %s" % (sys.argv[1],))
-
 firstTime = None
 
 for pkt, meta in reader:
